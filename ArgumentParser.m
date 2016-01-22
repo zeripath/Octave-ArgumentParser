@@ -32,6 +32,8 @@ classdef ArgumentParser < handle
             p.parse(varargin{:});
             obj.description = p.Results.description;
             obj.prog = p.Results.prog;
+            % Add the default help argument with the shortcut
+            % action to print the help and exit
             obj.add_argument({'-h', '--help'}, 'nargs', 0, 'help', ...
                 'Show help documentation', 'action', @() obj.print_help_and_exit());
         end
@@ -81,11 +83,12 @@ classdef ArgumentParser < handle
                     next = varargin{i};
                     if ischar(next)
                         if strcmp(next, '--')
-                            i = i +1;
+                            i = i + 1;
                             % munch and end options
                             break;
                         elseif next(1) ~= '-'
-                            % end of options
+                            % end of options - don't munch and pass
+                            % through to the positional section
                             break;
                         else
                             option_cell = obj.options( ...
@@ -193,9 +196,6 @@ classdef ArgumentParser < handle
                     end
                     p = p + 1;
                 end
-            end
-            % Shortcut help at this point
-            if obj.options{1}
             end
             % Now check whether the options have got the correct
             % settings
